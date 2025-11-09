@@ -101,7 +101,10 @@ def predict_fight(red_name, blue_name):
 # Flask wrapper
 
 app = Flask(__name__)
-CORS(app) 
+CORS(app, resources={r"/api/*": {"origins": [
+    "https://ufc-predictor-full-5rvqhaczn-aidan-wilkinsons-projects.vercel.app",
+    "https://ufc-predictor-full.vercel.app"
+]}}) 
 
 @app.route("/api/predict", methods=["POST"])
 def api_predict():
