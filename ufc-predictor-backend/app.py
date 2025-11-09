@@ -9,7 +9,7 @@ import joblib
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "model", "ufc_model.pkl")
 SCALER_PATH = os.path.join(BASE_DIR, "model", "scaler.pkl")
-CSV_PATH = os.path.join(BASE_DIR, "data", "ufc.csv")
+CSV_PATH = os.path.join(BASE_DIR, "data", "UFC.csv")
 
 # Load model, scaler and data
 model = joblib.load(MODEL_PATH)
