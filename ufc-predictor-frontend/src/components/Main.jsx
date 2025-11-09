@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 
 const Main = () => {
   const [redFighter, setRedFighter] = useState("");
@@ -23,7 +25,7 @@ const Main = () => {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/api/predict", {
+      const res = await fetch(`${API_URL}/api/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
