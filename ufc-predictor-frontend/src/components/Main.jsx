@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-
+console.log("DEBUG_API_URL:", API_URL);
 
 const Main = () => {
   const [redFighter, setRedFighter] = useState("");
