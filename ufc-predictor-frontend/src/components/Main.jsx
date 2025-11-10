@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-console.log("DEBUG_API_URL:", API_URL);
 
 const Main = () => {
   const [redFighter, setRedFighter] = useState("");
   const [blueFighter, setBlueFighter] = useState("");
+  const [fighters, setFighters] = useState([]) ;
   const [prediction, setPrediction] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -61,7 +62,8 @@ const Main = () => {
           history.
           <br></br>
           <span className="text-[12px] text-gray-400">
-            NOTE: This is most accurate for fighters in the same weight class.
+            NOTE: For the most accurate results, use fighters in the same weight
+            class.
           </span>
         </p>
         <div className="flex flex-row flex-wrap justify-center items-stretch">
@@ -106,7 +108,7 @@ const Main = () => {
           </p>
         )}
 
-        <div className="flex flex-col md:flex-row items-center justify-center gap-6 px-4">
+        <div className="flex flex-col md:flex-column items-center justify-center gap-4 px-4">
           <button
             onClick={handlePredict}
             className="bg-green-600 hover:bg-green-800 text-white font-bold text-xl px-8 py-4 rounded-lg shadow-xl hover:scale-102 cursor-pointer duration-200 w-full md:w-auto m-4"
@@ -114,7 +116,7 @@ const Main = () => {
             {isLoading ? "Predicting..." : "Predict Winner"}
           </button>
 
-          <div className="bg-black/70 rounded-lg p-6 shadow-xl w-full md:w-auto md:min-w-[280px]">
+          <div className="bg-black/70 rounded-lg p-6 shadow-xl w-full md:w-auto md:min-w-[400px]">
             <p className="text-gray-400 text-sm text-center">
               Predicted Winner
             </p>

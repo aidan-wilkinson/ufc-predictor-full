@@ -65,7 +65,7 @@ def predict_fight(red_name, blue_name):
         red_stats = get_fighter_stats(red_name, 'r')
         blue_stats = get_fighter_stats(blue_name, 'b')
     except IndexError:
-        return NameError ;
+        return None 
 
     # calculate differences
     features = np.array([
@@ -102,8 +102,11 @@ def predict_fight(red_name, blue_name):
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": [
-    "https://aidans-ufc-predictor.vercel.app"
-]}}) 
+    "https://aidans-ufc-predictor.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175"
+]}})
 
 @app.route("/api/predict", methods=["POST"])
 def api_predict():
