@@ -37,10 +37,15 @@ const Main = () => {
       const data = await res.json();
 
       // if Flask returned error (HTTP 400)
-      if (!res.ok) {
-        const err = await res.json();
+      if (!res.ok || data.error) {
         setIsError(true);
-        setErrorMessage("Network Error. Please Try Again");
+        if (data.error && data.error.includes("Fighter Not Found")) {
+          setErrorMessage(
+            "One or both fighters not found. Check for proper spelling."
+          );
+        } else {
+          setErrorMessage("Network Error. Please Try Again");
+        }
         setIsLoading(false);
         return;
       }
