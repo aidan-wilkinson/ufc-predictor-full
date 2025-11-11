@@ -62,7 +62,7 @@ const Main = () => {
       setIsError(false);
     } catch (e) {
       setIsError(true);
-      setErrorMessage("Unable to connect to the server. Please try again.");
+      setErrorMessage("Something went wrong. Check your inputs and try again.");
     } finally {
       setIsLoading(false);
     }
