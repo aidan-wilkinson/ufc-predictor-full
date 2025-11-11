@@ -65,8 +65,7 @@ def predict_fight(red_name, blue_name):
         red_stats = get_fighter_stats(red_name, 'r')
         blue_stats = get_fighter_stats(blue_name, 'b')
     except IndexError:
-        return None 
-
+        return {"error": "Fighter Not Found. Check for proper spelling."}, 404
     # calculate differences
     features = np.array([
         red_stats['sig_str'] - blue_stats['sig_str'],

@@ -5,14 +5,16 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const Main = () => {
   const [redFighter, setRedFighter] = useState("");
   const [blueFighter, setBlueFighter] = useState("");
-  const [fighters, setFighters] = useState([]) ;
+  const [fighters, setFighters] = useState([]);
   const [prediction, setPrediction] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("Error Occured");
 
   const handlePredict = async () => {
     if (!redFighter.trim() || !blueFighter.trim()) {
       setIsError(true);
+      setErrorMessage("Both fighter names are required.");
       return;
     }
 
@@ -32,19 +34,30 @@ const Main = () => {
         body: JSON.stringify(payload),
       });
 
+      const data = await res.json();
+
       // if Flask returned error (HTTP 400)
       if (!res.ok) {
         const err = await res.json();
         setIsError(true);
+        setErrorMessage("Network Error. Please Try Again");
         setIsLoading(false);
         return;
       }
 
-      const data = await res.json();
+      if (!data.message || data.message.toLowerCase().includes("not found")) {
+        setIsError(true);
+        setErrorMessage(
+          "One or both fighters not found. Check for proper spelling."
+        );
+        return;
+      }
+
       setPrediction(data.message);
       setIsError(false);
     } catch (e) {
       setIsError(true);
+      setErrorMessage("Unable to connect to the server. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -104,7 +117,7 @@ const Main = () => {
 
         {isError && (
           <p className="text-red-600 text-center font-bold text-2xl m-4">
-            ERROR OCCURED
+            {errorMessage}
           </p>
         )}
 
