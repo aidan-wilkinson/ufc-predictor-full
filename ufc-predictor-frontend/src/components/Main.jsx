@@ -108,7 +108,7 @@ const Main = () => {
       clearTimeout(timeout);
       setIsError(true);
       if (e.name === "AbortError") {
-        setErrorMessage("Server inactive, try again in 30 seconds.");
+        setErrorMessage("Server inactive, try again in 60 seconds.");
       } else {
         setErrorMessage(
           "Something went wrong. Check your inputs and try again.",
