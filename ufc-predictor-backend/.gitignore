@@ -1,13 +1,14 @@
-# Frontend
-frontend/node_modules/
-frontend/build/
-frontend/.env
+# Python cache
+__pycache__/
+*.py[cod]
 
-# Backend
-backend/__pycache__/
-backend/*.pyc
-backend/venv/
-backend/.env
+# Virtual environments
+venv/
+.venv/
 
-# General
-.DS_Store
+# Environment variables / secrets
+.env
+.env.*
+
+# Logs
+*.log

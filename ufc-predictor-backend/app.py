@@ -31,41 +31,41 @@ df["b_age"] = (df["date"] - df["b_dob_y"]).dt.days / 365.25
 
 
 def get_fighter_stats(fighter_name, corner):
-    matches = df[df[f'{corner}_name'] == fighter_name]
+    # search both corners in the historical data | corner assignment in the raw
+    # dataset is per-fight, not per-fighter, so a fighter may only ever appear
+    # as one corner historically even though they can be predicted as either.
+    matches = df[(df['r_name'] == fighter_name) | (df['b_name'] == fighter_name)]
     if matches.empty:
         raise IndexError
-    # get most recent fight for latest stats
+
     row = matches.sort_values('date').iloc[-1]
 
+    # figure out which side this fighter was on in their most recent fight
+    found_corner = 'r' if row['r_name'] == fighter_name else 'b'
+
     stats = {
-        # striking
-        'splm':    row.get(f'{corner}_splm_x',        0),
-        'sapm':    row.get(f'{corner}_sapm_x',        0),
-        'str_acc': row.get(f'{corner}_str_acc_x',     0),
-        'str_def': row.get(f'{corner}_str_def_x',     0),
-        # grappling
-        'td_avg':  row.get(f'{corner}_td_avg_x',      0),
-        'td_acc':  row.get(f'{corner}_td_avg_acc_x',  0),
-        'td_def':  row.get(f'{corner}_td_def_x',      0),
-        'sub_avg': row.get(f'{corner}_sub_avg_x',     0),
-        # physical
-        'reach':   row.get(f'{corner}_reach',         0),
-        'height':  row.get(f'{corner}_height',        0),
-        'weight':  row.get(f'{corner}_weight_x',      0),
-        'age':     row.get(f'{corner}_age',           0),
-        # record
-        'wins':    row.get(f'{corner}_wins',          0),
-        'losses':  row.get(f'{corner}_losses',        0),
-        # momentum
-        'last_3_wins':       row.get(f'{corner}_last_3_wins',           0),
-        'last_6_wins':       row.get(f'{corner}_last_6_wins',           0),
-        'ufc_fights_before': row.get(f'{corner}_ufc_fights_before',     0),
-        'days_since':        row.get(f'{corner}_days_since_last_fight', 365),
-        'quality_last_3':    row.get(f'{corner}_quality_last_3',        0),
-        'quality_last_6':    row.get(f'{corner}_quality_last_6',        0),
+        'splm':    row.get(f'{found_corner}_splm_x',        0),
+        'sapm':    row.get(f'{found_corner}_sapm_x',        0),
+        'str_acc': row.get(f'{found_corner}_str_acc_x',     0),
+        'str_def': row.get(f'{found_corner}_str_def_x',     0),
+        'td_avg':  row.get(f'{found_corner}_td_avg_x',      0),
+        'td_acc':  row.get(f'{found_corner}_td_avg_acc_x',  0),
+        'td_def':  row.get(f'{found_corner}_td_def_x',      0),
+        'sub_avg': row.get(f'{found_corner}_sub_avg_x',     0),
+        'reach':   row.get(f'{found_corner}_reach',         0),
+        'height':  row.get(f'{found_corner}_height',        0),
+        'weight':  row.get(f'{found_corner}_weight_x',      0),
+        'age':     row.get(f'{found_corner}_age',           0),
+        'wins':    row.get(f'{found_corner}_wins',          0),
+        'losses':  row.get(f'{found_corner}_losses',        0),
+        'last_3_wins':       row.get(f'{found_corner}_last_3_wins',           0),
+        'last_6_wins':       row.get(f'{found_corner}_last_6_wins',           0),
+        'ufc_fights_before': row.get(f'{found_corner}_ufc_fights_before',     0),
+        'days_since':        row.get(f'{found_corner}_days_since_last_fight', 365),
+        'quality_last_3':    row.get(f'{found_corner}_quality_last_3',        0),
+        'quality_last_6':    row.get(f'{found_corner}_quality_last_6',        0),
     }
 
-    # replace NaN with 0
     for key in stats:
         if pd.isna(stats[key]):
             stats[key] = 0
