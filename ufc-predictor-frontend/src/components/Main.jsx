@@ -127,8 +127,8 @@ const Main = () => {
         </h1>
         <p className="text-white text-l text-center m-2 w-[90%] md:w-[85%] lg:w-[82%] mx-auto">
           Enter fighter names in their respective corners, click predict, and
-          get the expected P4P winner based on fighter stats and performance!
-          history. <br></br> Historically, the model is ~70% accurate.
+          get the expected P4P winner based on fighter stats and performance
+          history! Historically, the model is ~70% accurate.
           <br></br>
           <span className="text-[12px] text-gray-400">
             NOTE: The server will go inactive after 15 mins of idle (sorry).
