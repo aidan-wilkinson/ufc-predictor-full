@@ -494,3 +494,4 @@ print("=" * 60)
 print(f"New fights scraped this run: {len(fight_details)}")
 print(f"Saved to: {output_path}")
 print("=" * 60)
+
