@@ -164,10 +164,10 @@ const Main = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-start md:items-center justify-center px-4 py-10 md:py-16">
+    <div className="min-h-screen flex items-start md:items-center justify-center px-4 py-10 md:py-16 bg-black/60">
       <div className="w-full max-w-2xl">
         {/* Header */}
-        <div className="text-center mb-8 bg-black/60 rounded-xl p-5">
+        <div className="text-center mb-8 rounded-xl p-5">
           <p className="text-emerald-400 text-xs font-bold tracking-widest uppercase mb-2">
             UFC Fight predictor
           </p>
