@@ -181,7 +181,7 @@ const Main = () => {
         </div>
 
         {/* Card */}
-        <div className="bg-[#161616] border border-white/10 rounded-xl overflow-hidden">
+        <div className="bg-[#161616] border border-white/10 rounded-xl">
           {/* Corners */}
           <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr]">
             <div className="p-5 border-b md:border-b-0 md:border-r border-white/10">
@@ -204,7 +204,7 @@ const Main = () => {
                   autoComplete="off"
                 />
                 {redSuggestions.length > 0 && (
-                  <ul className="absolute z-10 top-full mt-1 bg-[#1c1c1c] border border-white/10 w-full rounded-md shadow-lg max-h-48 overflow-y-auto animate-fade-down">
+                  <ul className="absolute z-50 top-full mt-1 bg-[#1c1c1c] border border-white/10 w-full rounded-md shadow-lg max-h-48 overflow-y-auto animate-fade-down">
                     {redSuggestions.map((name) => (
                       <li
                         key={name}
@@ -256,7 +256,7 @@ const Main = () => {
                   autoComplete="off"
                 />
                 {blueSuggestions.length > 0 && (
-                  <ul className="absolute z-10 top-full mt-1 bg-[#1c1c1c] border border-white/10 w-full rounded-md shadow-lg max-h-48 overflow-y-auto animate-fade-down">
+                  <ul className="absolute z-50 top-full mt-1 bg-[#1c1c1c] border border-white/10 w-full rounded-md shadow-lg max-h-48 overflow-y-auto animate-fade-down">
                     {blueSuggestions.map((name) => (
                       <li
                         key={name}
