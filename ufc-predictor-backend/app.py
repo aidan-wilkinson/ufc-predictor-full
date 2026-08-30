@@ -168,7 +168,7 @@ def predict_fight(red_name, blue_name):
 
     features = pd.DataFrame([{
         # physical
-        "age_diff":            age_diff,
+        #"age_diff":            age_diff,
         "reach_diff":          red['reach']  - blue['reach'],
         "height_diff":         red['height'] - blue['height'],
         "weight_class":        red['weight'],
