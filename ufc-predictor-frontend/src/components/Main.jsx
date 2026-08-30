@@ -1,10 +1,52 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-const style = document.createElement("style");
-style.textContent = `@keyframes fadeDown { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }`;
-document.head.appendChild(style);
+// Parses "Fighter Name will likely win (73.2% confidence)" into parts.
+// Falls back gracefully to just showing the raw message if the format
+// ever changes on the backend.
+function parsePrediction(message) {
+  const match = message.match(
+    /^(.+?)\s+will likely win\s+\(([\d.]+)%\s+confidence\)$/i,
+  );
+  if (!match) return { winner: null, confidence: null, raw: message };
+  return { winner: match[1], confidence: parseFloat(match[2]), raw: message };
+}
+
+// Animates a number counting up from 0 to `target` whenever `target` changes.
+function useCountUp(target, duration = 900) {
+  const [value, setValue] = useState(0);
+  const frameRef = useRef(null);
+
+  useEffect(() => {
+    if (target === null || target === undefined) {
+      setValue(0);
+      return;
+    }
+    const start = performance.now();
+    const from = 0;
+
+    const tick = (now) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(from + (target - from) * eased);
+      if (progress < 1) {
+        frameRef.current = requestAnimationFrame(tick);
+      } else {
+        setValue(target);
+      }
+    };
+
+    frameRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    };
+  }, [target, duration]);
+
+  return value;
+}
 
 const Main = () => {
   const [redFighter, setRedFighter] = useState("");
@@ -12,12 +54,13 @@ const Main = () => {
   const [fighters, setFighters] = useState([]);
   const [redSuggestions, setRedSuggestions] = useState([]);
   const [blueSuggestions, setBlueSuggestions] = useState([]);
-  const [prediction, setPrediction] = useState(null);
+  const [prediction, setPrediction] = useState(null); // { winner, confidence, raw }
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("Error Occured");
+  const [errorMessage, setErrorMessage] = useState("Error occurred");
 
-  // fetch fighters on mount
+  const animatedConfidence = useCountUp(prediction?.confidence ?? null);
+
   useEffect(() => {
     fetch(`${API_URL}/api/fighters`)
       .then((res) => res.json())
@@ -49,6 +92,13 @@ const Main = () => {
     }
   };
 
+  const handleSwap = () => {
+    setRedFighter(blueFighter);
+    setBlueFighter(redFighter);
+    setRedSuggestions([]);
+    setBlueSuggestions([]);
+  };
+
   const handlePredict = async () => {
     if (!redFighter.trim() || !blueFighter.trim()) {
       setIsError(true);
@@ -60,11 +110,7 @@ const Main = () => {
     setIsLoading(true);
     setPrediction(null);
 
-    const payload = {
-      red: redFighter.trim(),
-      blue: blueFighter.trim(),
-    };
-
+    const payload = { red: redFighter.trim(), blue: blueFighter.trim() };
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
 
@@ -83,12 +129,12 @@ const Main = () => {
         setIsError(true);
         if (data.error && data.error.includes("Fighter Not Found")) {
           setErrorMessage(
-            "One or both fighters not found. Check for proper spelling.",
+            "One or both fighters not found. Check the spelling.",
           );
         } else if (data.error && data.error.includes("two different")) {
-          setErrorMessage("Please enter two different fighters.");
+          setErrorMessage("Enter two different fighters.");
         } else {
-          setErrorMessage("Network Error. Please Try Again");
+          setErrorMessage("Network error. Try again.");
         }
         setIsLoading(false);
         return;
@@ -96,19 +142,17 @@ const Main = () => {
 
       if (!data.message || data.message.toLowerCase().includes("not found")) {
         setIsError(true);
-        setErrorMessage(
-          "One or both fighters not found. Check for proper spelling.",
-        );
+        setErrorMessage("One or both fighters not found. Check the spelling.");
         return;
       }
 
-      setPrediction(data.message);
+      setPrediction(parsePrediction(data.message));
       setIsError(false);
     } catch (e) {
       clearTimeout(timeout);
       setIsError(true);
       if (e.name === "AbortError") {
-        setErrorMessage("Server inactive, try again in 60 seconds.");
+        setErrorMessage("Server inactive. Try again in 60 seconds.");
       } else {
         setErrorMessage(
           "Something went wrong. Check your inputs and try again.",
@@ -120,130 +164,187 @@ const Main = () => {
   };
 
   return (
-    <div className="flex justify-center mt-10">
-      <div className="bg-black/80 p-6 rounded-lg shadow-lg w-[90%] md:w-[85%] lg:w-[75%] xl:w-[60%] mb-20 hover:scale-101 duration-300">
-        <h1 className="text-white text-4xl font-bold text-center bg-black/90 p-4 rounded-xl mb-0.5 w-[90%] md:w-[85%] lg:w-[82%] mx-auto">
-          UFC FIGHT PREDICTOR
-        </h1>
-        <p className="text-white text-l text-center m-2 w-[90%] md:w-[85%] lg:w-[82%] mx-auto">
-          Enter fighter names in their respective corners, click predict, and
-          get the expected P4P winner based on fighter stats and performance
-          history! Historically, the model is ~70% accurate.
-          <br></br>
-          <span className="text-[12px] text-gray-400">
-            NOTE: The server will go inactive after 15 mins of idle (sorry).
-          </span>
-        </p>
-        <div className="flex flex-row flex-wrap justify-center items-stretch">
-          <div className="bg-[#F54927] rounded-md p-4 m-4 md:mx-7 lg:mx-10 shadow-xl w-full md:w-[35%] hover:scale-102 duration-200 flex flex-col">
-            <p className="text-white text-3xl font-bold text-center mb-2 mx-auto bg-red-800 rounded-md p-2 px-4 w-fit">
-              Red Corner
-            </p>
-            <p className="text-white text-sm text-center mb-4 mt-2 mx-auto font-semibold flex-grow">
-              The red corner is typically assigned to the fighter who is ranked
-              higher.
-            </p>
-            <div className="relative w-full">
-              <input
-                className="bg-white rounded-md p-2 text-center mx-auto mb-4 focus:outline-none focus:ring-2 focus:ring-red-800 duration-100 w-full"
-                type="text"
-                placeholder="Fighter Name"
-                value={redFighter}
-                onChange={handleRedChange}
-              />
-              {redSuggestions.length > 0 && (
-                <ul
-                  style={{ animation: "0.15s ease-in-out fadeDown" }}
-                  className="absolute z-10 bg-white w-full rounded-md shadow-lg max-h-48 overflow-y-auto"
-                >
-                  {redSuggestions.map((name) => (
-                    <li
-                      key={name}
-                      className="p-2 hover:bg-gray-100 cursor-pointer text-black text-center capitalize border-b border-gray-100 last:border-0"
-                      onClick={() => {
-                        setRedFighter(name);
-                        setRedSuggestions([]);
-                      }}
-                    >
-                      {name}
-                    </li>
-                  ))}
-                </ul>
-              )}
+    <div className="min-h-screen flex items-start md:items-center justify-center px-4 py-10 md:py-16">
+      <div className="w-full max-w-2xl">
+        {/* Header */}
+        <div className="text-center mb-8 bg-black/60 rounded-xl p-5">
+          <p className="text-emerald-400 text-xs font-bold tracking-widest uppercase mb-2">
+            Fight predictor
+          </p>
+          <h1 className="text-white text-2xl md:text-3xl font-bold mb-3">
+            Who wins this matchup?
+          </h1>
+          <p className="text-gray-200 text-sm leading-relaxed max-w-md mx-auto">
+            Enter both fighters to get the model's pick, based on career stats,
+            recent form, and matchup history.
+          </p>
+        </div>
+
+        {/* Card */}
+        <div className="bg-[#161616] border border-white/10 rounded-xl overflow-hidden">
+          {/* Corners */}
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr]">
+            <div className="p-5 border-b md:border-b-0 md:border-r border-white/10">
+              <div className="flex items-center gap-2 mb-3">
+                <span
+                  className="w-2 h-2 rounded-full bg-red-500"
+                  aria-hidden="true"
+                />
+                <p className="text-gray-100 text-sm font-semibold">
+                  Red corner
+                </p>
+              </div>
+              <div className="relative">
+                <input
+                  className="bg-[#0d0d0d] text-white placeholder-gray-500 text-sm rounded-md px-3 py-2.5 w-full border border-white/10 focus:outline-none focus:border-red-500/60 transition-colors"
+                  type="text"
+                  placeholder="Fighter name"
+                  value={redFighter}
+                  onChange={handleRedChange}
+                  autoComplete="off"
+                />
+                {redSuggestions.length > 0 && (
+                  <ul className="absolute z-10 top-full mt-1 bg-[#1c1c1c] border border-white/10 w-full rounded-md shadow-lg max-h-48 overflow-y-auto animate-fade-down">
+                    {redSuggestions.map((name) => (
+                      <li
+                        key={name}
+                        className="px-3 py-2 hover:bg-white/5 cursor-pointer text-gray-100 text-sm capitalize border-b border-white/5 last:border-0"
+                        onClick={() => {
+                          setRedFighter(name);
+                          setRedSuggestions([]);
+                        }}
+                      >
+                        {name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+
+            {/* VS divider — the circular badge is the ONLY bordered element here,
+                no partial container border competing with it */}
+            <div className="flex md:flex-col items-center justify-center gap-1.5 py-3 md:py-0 md:px-5">
+              <div className="border border-white/15 rounded-full w-9 h-9 flex items-center justify-center bg-[#0d0d0d] shrink-0">
+                <span className="text-gray-300 text-xs font-bold">VS</span>
+              </div>
+              <button
+                onClick={handleSwap}
+                className="text-emerald-400 hover:text-emerald-300 text-xs font-medium transition-colors cursor-pointer"
+              >
+                swap
+              </button>
+            </div>
+
+            <div className="p-5 border-t md:border-t-0 md:border-l border-white/10">
+              <div className="flex items-center gap-2 mb-3">
+                <span
+                  className="w-2 h-2 rounded-full bg-blue-500"
+                  aria-hidden="true"
+                />
+                <p className="text-gray-100 text-sm font-semibold">
+                  Blue corner
+                </p>
+              </div>
+              <div className="relative">
+                <input
+                  className="bg-[#0d0d0d] text-white placeholder-gray-500 text-sm rounded-md px-3 py-2.5 w-full border border-white/10 focus:outline-none focus:border-blue-500/60 transition-colors"
+                  type="text"
+                  placeholder="Fighter name"
+                  value={blueFighter}
+                  onChange={handleBlueChange}
+                  autoComplete="off"
+                />
+                {blueSuggestions.length > 0 && (
+                  <ul className="absolute z-10 top-full mt-1 bg-[#1c1c1c] border border-white/10 w-full rounded-md shadow-lg max-h-48 overflow-y-auto animate-fade-down">
+                    {blueSuggestions.map((name) => (
+                      <li
+                        key={name}
+                        className="px-3 py-2 hover:bg-white/5 cursor-pointer text-gray-100 text-sm capitalize border-b border-white/5 last:border-0"
+                        onClick={() => {
+                          setBlueFighter(name);
+                          setBlueSuggestions([]);
+                        }}
+                      >
+                        {name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="bg-[#1D4ED8] rounded-md p-4 m-4 md:mx-7 lg:mx-10 shadow-xl w-full md:w-[35%] hover:scale-102 duration-200 flex flex-col">
-            <p className="text-white text-3xl font-bold text-center mb-2 mx-auto bg-blue-950 rounded-md p-2 px-4 w-fit">
-              Blue Corner
-            </p>
-            <p className="text-white text-sm text-center mb-4 mt-2 mx-auto font-semibold flex-grow">
-              The blue corner is typically assigned to the fighter who is ranked
-              lower.
-            </p>
-            <div className="relative w-full">
-              <input
-                className="bg-white rounded-md p-2 text-center mx-auto mb-4 focus:outline-none focus:ring-2 focus:ring-blue-950 duration-100 w-full"
-                type="text"
-                placeholder="Fighter Name"
-                value={blueFighter}
-                onChange={handleBlueChange}
-              />
-              {blueSuggestions.length > 0 && (
-                <ul
-                  style={{ animation: "0.15s ease-in-out fadeDown" }}
-                  className="absolute z-10 bg-white w-full rounded-md shadow-lg max-h-48 overflow-y-auto"
-                >
-                  {blueSuggestions.map((name) => (
-                    <li
-                      key={name}
-                      className="p-2 hover:bg-gray-100 cursor-pointer text-black text-center capitalize border-b border-gray-100 last:border-0"
-                      onClick={() => {
-                        setBlueFighter(name);
-                        setBlueSuggestions([]);
-                      }}
-                    >
-                      {name}
-                    </li>
-                  ))}
-                </ul>
-              )}
+          {/* Error */}
+          {isError && (
+            <div className="border-t border-white/10 bg-red-500/10 px-5 py-3">
+              <p className="text-red-300 text-sm text-center font-medium">
+                {errorMessage}
+              </p>
             </div>
+          )}
+
+          {/* Predict */}
+          <div className="border-t border-white/10 p-5">
+            <button
+              onClick={handlePredict}
+              disabled={isLoading}
+              className="bg-emerald-500 hover:bg-emerald-400 disabled:bg-emerald-800 disabled:cursor-not-allowed text-black text-sm font-bold rounded-md py-2.5 w-full transition-colors flex items-center justify-center gap-2"
+            >
+              {isLoading && (
+                <span
+                  className="h-3.5 w-3.5 rounded-full border-2 border-black/30 border-t-black animate-spin"
+                  aria-hidden="true"
+                />
+              )}
+              {isLoading ? "Predicting" : "Predict winner"}
+            </button>
           </div>
         </div>
 
-        {isError && (
-          <p className="text-red-600 text-center font-bold text-2xl m-4">
-            {errorMessage}
+        {/* Result: winner name */}
+        <div className="mt-4 bg-[#161616] border border-white/10 rounded-xl p-5 text-center">
+          <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide mb-1.5">
+            Predicted winner
           </p>
+          <p
+            className={`min-h-[24px] flex items-center justify-center ${
+              prediction && !isLoading
+                ? "text-white text-base font-bold animate-fade-down"
+                : "text-gray-500 text-sm"
+            }`}
+          >
+            {isLoading
+              ? "Crunching the numbers..."
+              : prediction
+                ? (prediction.winner ?? prediction.raw)
+                : "Enter two fighters above to see a prediction"}
+          </p>
+        </div>
+
+        {/* Confidence — its own card, with an animated count-up + fill bar */}
+        {prediction?.confidence != null && !isLoading && (
+          <div className="mt-4 bg-[#161616] border border-white/10 rounded-xl p-5">
+            <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide mb-3 text-center">
+              Model confidence
+            </p>
+            <p className="text-emerald-400 text-4xl font-bold text-center mb-3 tabular-nums">
+              {animatedConfidence.toFixed(1)}%
+            </p>
+            <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-emerald-500 transition-[width] duration-100 ease-out"
+                style={{ width: `${animatedConfidence}%` }}
+              />
+            </div>
+          </div>
         )}
 
-        <div className="flex flex-col md:flex-column items-center justify-center gap-4 px-4">
-          <button
-            onClick={handlePredict}
-            className="bg-green-600 hover:bg-green-800 text-white font-bold text-xl px-8 py-4 rounded-lg shadow-xl hover:scale-102 cursor-pointer duration-200 w-full md:w-auto m-4"
-          >
-            {isLoading ? "Predicting..." : "Predict Winner"}
-          </button>
-
-          <div className="bg-black/70 rounded-lg p-6 shadow-xl w-full md:w-auto md:min-w-[400px]">
-            <p className="text-gray-400 text-sm text-center">
-              Predicted Winner
-            </p>
-            <p className="text-white text-2xl font-bold text-center mb-2">
-              {isLoading
-                ? "Predicting winner..."
-                : prediction
-                  ? prediction
-                  : ""}
-            </p>
-            {/*
-            <div className="bg-green-600 rounded-md py-2 px-4 w-fit mx-auto">
-              <p className="text-white font-bold text-lg">Confidence %</p>
-            </div>
-            */}
-          </div>
-        </div>
+        <p className="text-gray-300 text-xs text-center mt-6 bg-black/50 rounded-lg py-2 px-3">
+          Model accuracy is roughly 65&ndash;73% depending on fighter
+          experience. Server sleeps after 15 minutes of inactivity, so the first
+          request may take a moment.
+        </p>
       </div>
     </div>
   );

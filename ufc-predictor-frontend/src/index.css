@@ -1,11 +1,27 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 body {
-  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('assets/ufc-background.jpg');
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("assets/ufc-background.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
   min-height: 100vh;
 }
-  
+
+@theme {
+  --animate-fade-down: fadeDown 0.15s ease-in-out;
+
+  @keyframes fadeDown {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
