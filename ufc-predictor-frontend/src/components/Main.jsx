@@ -169,7 +169,7 @@ const Main = () => {
         {/* Header */}
         <div className="text-center mb-8 bg-black/60 rounded-xl p-5">
           <p className="text-emerald-400 text-xs font-bold tracking-widest uppercase mb-2">
-            Fight predictor
+            UFC Fight predictor
           </p>
           <h1 className="text-white text-2xl md:text-3xl font-bold mb-3">
             Who wins this matchup?
@@ -289,7 +289,7 @@ const Main = () => {
             <button
               onClick={handlePredict}
               disabled={isLoading}
-              className="bg-emerald-500 hover:bg-emerald-400 disabled:bg-emerald-800 disabled:cursor-not-allowed text-black text-sm font-bold rounded-md py-2.5 w-full transition-colors flex items-center justify-center gap-2"
+              className="bg-emerald-500 hover:bg-emerald-400 disabled:bg-emerald-800 disabled:cursor-not-allowed text-black text-sm font-bold rounded-md py-2.5 w-full transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               {isLoading && (
                 <span
