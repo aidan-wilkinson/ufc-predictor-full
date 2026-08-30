@@ -206,6 +206,7 @@ def predict_fight(red_name, blue_name):
 
         # elo
         "elo_diff":         r_elo - b_elo,
+        "total_elo":        r_elo + b_elo,
 
         # chin
         "chin_diff": red['chin_metric'] - blue['chin_metric'],
