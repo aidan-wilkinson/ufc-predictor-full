@@ -289,7 +289,7 @@ const Main = () => {
             <button
               onClick={handlePredict}
               disabled={isLoading}
-              className="bg-emerald-500 hover:bg-emerald-400 disabled:bg-emerald-800 disabled:cursor-not-allowed text-black text-4xl font-bold rounded-md py-2.5 w-full transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              className="bg-emerald-500 hover:bg-emerald-400 disabled:bg-emerald-800 disabled:cursor-not-allowed text-black text-sm font-bold rounded-md py-2.5 w-full transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               {isLoading && (
                 <span
@@ -304,7 +304,7 @@ const Main = () => {
 
         {/* Result: winner name */}
         <div className="mt-4 bg-[#161616] border border-white/10 rounded-xl p-5 text-center">
-          <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide mb-1.5">
+          <p className="text-gray-400 text-4xl font-semibold uppercase tracking-wide mb-1.5">
             Predicted winner
           </p>
           <p
