@@ -179,10 +179,11 @@ const Main = () => {
             recent form, and matchup history.
           </p>
         </div>
-        {/* Card */}
-        <div className="bg-[#161616] border border-white/10 rounded-xl">
+        {/* Main prediction card */}
+        <div className="bg-[#161616] border border-white/10 rounded-xl overflow-hidden">
           {/* Corners */}
           <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr]">
+            {/* Red corner */}
             <div className="p-5 border-b md:border-b-0 md:border-r border-white/10">
               <div className="flex items-center gap-2 mb-3">
                 <span
@@ -193,6 +194,7 @@ const Main = () => {
                   Red corner
                 </p>
               </div>
+
               <div className="relative">
                 <input
                   className="bg-[#0d0d0d] text-white placeholder-gray-500 text-sm rounded-md px-3 py-2.5 w-full border border-white/10 focus:outline-none focus:border-red-500/60 transition-colors"
@@ -202,6 +204,7 @@ const Main = () => {
                   onChange={handleRedChange}
                   autoComplete="off"
                 />
+
                 {redSuggestions.length > 0 && (
                   <ul className="absolute z-50 top-full mt-1 bg-[#1c1c1c] border border-white/10 w-full rounded-md shadow-lg max-h-48 overflow-y-auto animate-fade-down">
                     {redSuggestions.map((name) => (
@@ -221,12 +224,12 @@ const Main = () => {
               </div>
             </div>
 
-            {/* VS divider — the circular badge is the ONLY bordered element here,
-                no partial container border competing with it */}
+            {/* VS divider */}
             <div className="flex md:flex-col items-center justify-center gap-1.5 py-3 md:py-0 md:px-5">
               <div className="border border-white/15 rounded-full w-9 h-9 flex items-center justify-center bg-[#0d0d0d] shrink-0">
                 <span className="text-gray-300 text-xs font-bold">VS</span>
               </div>
+
               <button
                 onClick={handleSwap}
                 className="text-emerald-400 hover:text-emerald-300 text-xs font-medium transition-colors cursor-pointer"
@@ -235,6 +238,7 @@ const Main = () => {
               </button>
             </div>
 
+            {/* Blue corner */}
             <div className="p-5 border-t md:border-t-0 md:border-l border-white/10">
               <div className="flex items-center gap-2 mb-3">
                 <span
@@ -245,6 +249,7 @@ const Main = () => {
                   Blue corner
                 </p>
               </div>
+
               <div className="relative">
                 <input
                   className="bg-[#0d0d0d] text-white placeholder-gray-500 text-sm rounded-md px-3 py-2.5 w-full border border-white/10 focus:outline-none focus:border-blue-500/60 transition-colors"
@@ -254,6 +259,7 @@ const Main = () => {
                   onChange={handleBlueChange}
                   autoComplete="off"
                 />
+
                 {blueSuggestions.length > 0 && (
                   <ul className="absolute z-50 top-full mt-1 bg-[#1c1c1c] border border-white/10 w-full rounded-md shadow-lg max-h-48 overflow-y-auto animate-fade-down">
                     {blueSuggestions.map((name) => (
@@ -296,56 +302,59 @@ const Main = () => {
                   aria-hidden="true"
                 />
               )}
+
               {isLoading ? "Predicting" : "Predict winner"}
             </button>
           </div>
-        </div>
 
-        {/* Results */}
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Predicted winner */}
-          <div className="bg-[#161616] border border-white/10 rounded-xl p-5 text-center">
-            <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide mb-1.5">
-              Predicted winner
-            </p>
+          {/* Results */}
+          <div className="border-t border-white/10">
+            <div className="grid grid-cols-1 md:grid-cols-2">
+              {/* Predicted winner */}
+              <div className="p-5 text-center md:border-r border-white/10">
+                <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide mb-1.5">
+                  Predicted winner
+                </p>
 
-            <p
-              className={`min-h-[48px] flex items-center justify-center ${
-                prediction && !isLoading
-                  ? "text-white font-bold animate-fade-down text-3xl m-4"
-                  : "text-gray-500 text-sm m-4"
-              }`}
-            >
-              {isLoading
-                ? "Crunching the numbers..."
-                : prediction
-                  ? (prediction.winner ?? prediction.raw)
-                  : "Enter two fighters above to see a prediction"}
-            </p>
-          </div>
+                <p
+                  className={`min-h-[48px] flex items-center justify-center ${
+                    prediction && !isLoading
+                      ? "text-white font-bold animate-fade-down text-3xl m-4"
+                      : "text-gray-500 text-sm m-4"
+                  }`}
+                >
+                  {isLoading
+                    ? "Crunching the numbers..."
+                    : prediction
+                      ? (prediction.winner ?? prediction.raw)
+                      : "Enter two fighters above to see a prediction"}
+                </p>
+              </div>
 
-          {/* Model confidence */}
-          <div className="bg-[#161616] border border-white/10 rounded-xl p-5 text-center">
-            <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide mb-3">
-              Model confidence
-            </p>
+              {/* Model confidence */}
+              <div className="p-5 text-center">
+                <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide mb-3">
+                  Model confidence
+                </p>
 
-            <p className="text-emerald-400 text-4xl font-bold text-center mb-3 tabular-nums min-h-[48px] flex items-center justify-center">
-              {prediction?.confidence != null && !isLoading
-                ? `${animatedConfidence.toFixed(1)}%`
-                : "—"}
-            </p>
+                <p className="text-emerald-400 text-4xl font-bold text-center mb-3 tabular-nums min-h-[48px] flex items-center justify-center">
+                  {prediction?.confidence != null && !isLoading
+                    ? `${animatedConfidence.toFixed(1)}%`
+                    : "—"}
+                </p>
 
-            <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-emerald-500 transition-[width] duration-100 ease-out"
-                style={{
-                  width:
-                    prediction?.confidence != null && !isLoading
-                      ? `${animatedConfidence}%`
-                      : "0%",
-                }}
-              />
+                <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-emerald-500 transition-[width] duration-100 ease-out"
+                    style={{
+                      width:
+                        prediction?.confidence != null && !isLoading
+                          ? `${animatedConfidence}%`
+                          : "0%",
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
