@@ -289,7 +289,7 @@ const Main = () => {
             <button
               onClick={handlePredict}
               disabled={isLoading}
-              className="bg-emerald-500 hover:bg-emerald-400 disabled:bg-emerald-800 disabled:cursor-not-allowed text-black text-sm font-bold rounded-md py-2.5 w-full transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              className="bg-emerald-500 hover:bg-emerald-400 disabled:bg-emerald-800 disabled:cursor-not-allowed text-black text-4xl font-bold rounded-md py-2.5 w-full transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               {isLoading && (
                 <span
