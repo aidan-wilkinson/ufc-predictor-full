@@ -179,7 +179,6 @@ const Main = () => {
             recent form, and matchup history.
           </p>
         </div>
-
         {/* Card */}
         <div className="bg-[#161616] border border-white/10 rounded-xl">
           {/* Corners */}
@@ -301,45 +300,56 @@ const Main = () => {
             </button>
           </div>
         </div>
-
-        {/* Result: winner name */}
-        <div className="mt-4 bg-[#161616] border border-white/10 rounded-xl p-5 text-center">
-          <p className="text-gray-400 text-4xl font-semibold uppercase tracking-wide mb-1.5">
-            Predicted winner
-          </p>
-          <p
-            className={`min-h-[24px] flex items-center justify-center ${
-              prediction && !isLoading
-                ? "text-white text-base font-bold animate-fade-down"
-                : "text-gray-500 text-sm"
-            }`}
-          >
-            {isLoading
-              ? "Crunching the numbers..."
-              : prediction
-                ? (prediction.winner ?? prediction.raw)
-                : "Enter two fighters above to see a prediction"}
-          </p>
-        </div>
-
-        {/* Confidence — its own card, with an animated count-up + fill bar */}
-        {prediction?.confidence != null && !isLoading && (
-          <div className="mt-4 bg-[#161616] border border-white/10 rounded-xl p-5">
-            <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide mb-3 text-center">
-              Model confidence
+        {/* Results */}
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Predicted winner */}
+          <div className="bg-[#161616] border border-white/10 rounded-xl p-5 text-center">
+            <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide mb-1.5">
+              Predicted winner
             </p>
-            <p className="text-emerald-400 text-4xl font-bold text-center mb-3 tabular-nums">
-              {animatedConfidence.toFixed(1)}%
+
+            <p
+              className={`min-h-[48px] flex items-center justify-center ${
+                prediction && !isLoading
+                  ? "text-white font-bold animate-fade-down text-4xl m-3 tabular-nums"
+                  : "text-gray-500 text-sm"
+              }`}
+            >
+              {isLoading
+                ? "Crunching the numbers..."
+                : prediction
+                  ? (prediction.winner ?? prediction.raw)
+                  : "Enter two fighters above to see a prediction"}
             </p>
-            <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-emerald-500 transition-[width] duration-100 ease-out"
-                style={{ width: `${animatedConfidence}%` }}
-              />
-            </div>
           </div>
-        )}
 
+          {/* Confidence */}
+          {prediction?.confidence != null && !isLoading ? (
+            <div className="bg-[#161616] border border-white/10 rounded-xl p-5">
+              <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide mb-3 text-center">
+                Model confidence
+              </p>
+
+              <p className="text-emerald-400 text-4xl font-bold text-center mb-3 tabular-nums">
+                {animatedConfidence.toFixed(1)}%
+              </p>
+
+              <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-emerald-500 transition-[width] duration-100 ease-out"
+                  style={{ width: `${animatedConfidence}%` }}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="bg-[#161616] border border-white/10 rounded-xl p-5 flex items-center justify-center">
+              <p className="text-gray-500 text-sm text-center">
+                Confidence will appear here
+              </p>
+            </div>
+          )}
+        </div>
+        ```
         <p className="text-gray-300 text-xs text-center mt-6 bg-black/50 rounded-lg py-2 px-3">
           Model accuracy is roughly 65&ndash;73% depending on fighter
           experience. Server sleeps after 15 minutes of inactivity, so the first
