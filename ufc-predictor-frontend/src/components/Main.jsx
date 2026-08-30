@@ -319,7 +319,7 @@ const Main = () => {
                 <p
                   className={`min-h-[48px] flex items-center justify-center ${
                     prediction && !isLoading
-                      ? "text-white font-bold animate-fade-down text-3xl m-4"
+                      ? "text-emerald-400 font-bold animate-fade-down text-3xl m-4"
                       : "text-gray-500 text-sm m-4"
                   }`}
                 >
