@@ -41,9 +41,7 @@ function useCountUp(target, duration = 900) {
 // in whichever list (long or short) always reads as "full".
 function FactorRow({ factor, maxImportance, color }) {
   const widthPct =
-    maxImportance > 0
-      ? Math.max((factor.importance / maxImportance) * 100, 6)
-      : 6;
+    maxImportance > 0 ? (factor.importance / maxImportance) * 100 : 0;
 
   return (
     <li className="flex items-center gap-3">
@@ -52,12 +50,14 @@ function FactorRow({ factor, maxImportance, color }) {
           <span className="text-gray-100 text-sm capitalize truncate">
             {factor.label}
           </span>
+
           <span
             className={`text-${color}-400 text-[10px] font-semibold uppercase tracking-wide shrink-0`}
           >
             {factor.strength}
           </span>
         </div>
+
         <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
           <div
             className={`h-full bg-${color}-500 rounded-full transition-[width] duration-500 ease-out`}
@@ -75,7 +75,7 @@ function FactorRow({ factor, maxImportance, color }) {
 // 8-factor fight fully visible without either looking broken.
 const COLLAPSE_AT = 4;
 
-function FactorList({ title, emptyText, factors, color }) {
+function FactorList({ title, emptyText, factors, color, maxImportance }) {
   const [expanded, setExpanded] = useState(false);
 
   if (!factors || factors.length === 0) {
@@ -86,13 +86,14 @@ function FactorList({ title, emptyText, factors, color }) {
         >
           {title}
         </p>
+
         <p className="text-gray-500 text-sm">{emptyText}</p>
       </div>
     );
   }
 
-  const maxImportance = Math.max(...factors.map((f) => f.importance));
   const visible = expanded ? factors : factors.slice(0, COLLAPSE_AT);
+
   const hiddenCount = factors.length - visible.length;
 
   return (
@@ -102,6 +103,7 @@ function FactorList({ title, emptyText, factors, color }) {
       >
         {title}
       </p>
+
       <ul className="space-y-3">
         {visible.map((f) => (
           <FactorRow
@@ -121,6 +123,7 @@ function FactorList({ title, emptyText, factors, color }) {
           Show {hiddenCount} more
         </button>
       )}
+
       {expanded && factors.length > COLLAPSE_AT && (
         <button
           onClick={() => setExpanded(false)}
@@ -247,6 +250,17 @@ const Main = () => {
       setIsLoading(false);
     }
   };
+  // *Shared maximum importance across BOTH advantages and concerns.*
+
+  const allFactors = [
+    ...(result?.factors?.advantages || []),
+    ...(result?.factors?.concerns || []),
+  ];
+
+  const maxImportance =
+    allFactors.length > 0
+      ? Math.max(...allFactors.map((f) => f.importance))
+      : 0;
 
   return (
     <div className="min-h-screen flex items-start md:items-center justify-center px-4 py-10 md:py-16 bg-black/60">
@@ -440,12 +454,14 @@ const Main = () => {
                 emptyText="No single factor stands out... this one's close."
                 factors={result.factors?.advantages}
                 color="emerald"
+                maxImportance={maxImportance}
               />
               <FactorList
                 title={`Biggest concerns for ${result.winner}`}
                 emptyText="No significant red flags identified."
                 factors={result.factors?.concerns}
                 color="emerald"
+                maxImportance={maxImportance}
               />
             </div>
           )}
