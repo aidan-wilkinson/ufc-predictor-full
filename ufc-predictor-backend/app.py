@@ -156,7 +156,7 @@ FEATURE_GROUPS = {
 
 GROUP_LABELS = {
     "wrestling":          "grappling level",
-    "striking":           "striking exchanges",
+    "striking":           "striking dominance",
     "physical":           "physical attributes",
     "experience":         "UFC experience",
     "recent_form":        "recent form",
